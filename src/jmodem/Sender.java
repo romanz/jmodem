@@ -7,7 +7,7 @@ import java.io.OutputStream;
 
 public class Sender {
 
-	private final double[] carrier;
+	private final float[] carrier;
 
 	private short[] symbol;
 	private byte[] word;
@@ -15,16 +15,16 @@ public class Sender {
 	private OutputStream out;
 
 	public Sender(OutputStream o) {
-		 carrier = new double[Config.Nsym];
+		 carrier = new float[Config.Nsym];
 		 for (int i = 0; i < carrier.length; i++) {
-			 carrier[i] = Math.sin((2 * Math.PI * Config.Fc * i) / Config.Fs);
+			 carrier[i] = (float)Math.sin((2 * Math.PI * Config.Fc * i) / Config.Fs);
 		 }
 		 symbol = new short[carrier.length];
 		 word = new byte[2];
 		 out = o;
 	}
 
-	void send(double amplitude, int n) throws IOException {
+	void send(float amplitude, int n) throws IOException {
 		for (int i = 0; i < symbol.length; i++) {
 			symbol[i] = (short)(Config.SCALING * amplitude * carrier[i]);
 		}
@@ -43,16 +43,16 @@ public class Sender {
 		InputStream in = System.in;
 		Sender s = new Sender(new BufferedOutputStream(out, 1024));
 		
-		s.send(0., 500);
-		s.send(1., 400);
-		s.send(0., 100);
+		s.send(0f, 500);
+		s.send(1f, 400);
+		s.send(0f, 100);
 
 		int r = 0x1;
 		for (int i = 0; i < 200; ++i) {
 			r = Config.prbs(r, 16, 0x1100b);
-			s.send(2.0 * (r & 1) - 1, 1);
+			s.send(2f * (r & 1) - 1, 1);
 		}
-		s.send(0., 100);
+		s.send(0f, 100);
 		
 		while (true) {
 			int b = in.read();
@@ -61,11 +61,11 @@ public class Sender {
 			}
 			for (int i = 0; i < 8; i++) {
 				int bit = (b >> i) & 1;
-				s.send(2.0 * bit - 1, 1);
+				s.send(2f * bit - 1, 1);
 			}
 			
 		}
-		s.send(0., 500);
+		s.send(0f, 500);
 		out.flush();
 		out.close();
 	}
