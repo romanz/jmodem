@@ -6,7 +6,6 @@ public class SendTest {
 
 	@Test
 	public void test() {
-		new Sender();
 	}
 
 }

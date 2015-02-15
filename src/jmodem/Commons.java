@@ -1,0 +1,17 @@
+package jmodem;
+
+public class Commons {
+	public static final int SCALING = 32000;
+	public static final int Fs = 8000;
+	public static final int Fc = 2000;
+	public static final int Nsym = 8;
+	public static float Tsym = ((float) Nsym) / Fs;
+	
+	public static int prbs(int register, int size, int mask) {
+		register = register << 1;
+		if ((register >> size) != 0) {
+			register = register ^ mask;
+		}
+		return register;
+	}
+}
