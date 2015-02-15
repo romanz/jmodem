@@ -15,9 +15,9 @@ public class Sender {
 	private OutputStream out;
 
 	public Sender(OutputStream o) {
-		 carrier = new double[Commons.Nsym];
+		 carrier = new double[Config.Nsym];
 		 for (int i = 0; i < carrier.length; i++) {
-			 carrier[i] = Math.sin((2 * Math.PI * Commons.Fc * i) / Commons.Fs);
+			 carrier[i] = Math.sin((2 * Math.PI * Config.Fc * i) / Config.Fs);
 		 }
 		 symbol = new short[carrier.length];
 		 word = new byte[2];
@@ -26,7 +26,7 @@ public class Sender {
 
 	void send(double amplitude, int n) throws IOException {
 		for (int i = 0; i < symbol.length; i++) {
-			symbol[i] = (short)(Commons.SCALING * amplitude * carrier[i]);
+			symbol[i] = (short)(Config.SCALING * amplitude * carrier[i]);
 		}
 		for (int i = 0; i < n; i++) {
 			for (short value : symbol) {
@@ -49,7 +49,7 @@ public class Sender {
 
 		int r = 0x1;
 		for (int i = 0; i < 200; ++i) {
-			r = Commons.prbs(r, 16, 0x1100b);
+			r = Config.prbs(r, 16, 0x1100b);
 			s.send(2.0 * (r & 1) - 1, 1);
 		}
 		s.send(0., 100);

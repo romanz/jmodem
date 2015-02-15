@@ -1,6 +1,6 @@
 package jmodem;
 
-public class Commons {
+public class Config {
 	public static final int SCALING = 32000;
 	public static final int Fs = 8000;
 	public static final int Fc = 2000;
