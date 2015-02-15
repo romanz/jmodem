@@ -35,11 +35,14 @@ public class SamplerTest {
 		for (int i = 0; i < r.buffer.length; i++) {
 			r.buffer[i] = i;
 		}
-		Sampler s = new Sampler(r);
 		float[] b = new float[1024];
+		
+		Sampler s = new Sampler(r);
+		s.updateTime(1e-3f);
+		
 		s.read(b, 0, b.length);		
 		for (int i = 0; i < b.length; i++) {
-			assertEquals(b[i], i + s.width, 1e-15);
+			assertEquals(i + s.width, b[i], 1e-2);
 		}
 		try {
 			s.read(b, 0, b.length);

@@ -46,19 +46,27 @@ public class Sampler implements Recorder {
 	public void read(float[] buffer, int offset, int size) throws IOException {
 		for (int o = offset; o < size; o++) {
 			int k = (int)time;
-			int j = ((int)(time - k)) * resolution;
+			int j = (int)((time - k) * resolution);
 			float[] coeffs = filt[j];		
 			for (int end = k + width; index < end; index++) {
 				System.arraycopy(buff, 1, buff, 0, buff.length - 1);
 				src.read(buff, buff.length - 1, 1);
 			}
 			time += freq;
-			float result = 0f;
+			double result = 0f;
 			for (int i = 0; i < buff.length; i++) {
-				result += (coeffs[i] * buff[i]);				
+				result += (coeffs[i] * (double)buff[i]);				
 			}
-			buffer[o] = result;			
+			buffer[o] = (float)result;			
 		}
+	}
+	
+	public void updateTime(float dt) {
+		time += dt;
+	}
+	
+	public void updateFreq(float df) {
+		freq += df;
 	}
 
 }
