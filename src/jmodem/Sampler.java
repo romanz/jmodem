@@ -2,7 +2,7 @@ package jmodem;
 
 import java.io.IOException;
 
-public class Sampler implements Recorder {
+public class Sampler implements InputStream {
 	
 	public final int width = 128;
 	public final int resolution = 1024;
@@ -14,9 +14,9 @@ public class Sampler implements Recorder {
 	private float freq;
 	private float[] buff;
 	private int index;
-	private Recorder src;
+	private InputStream src;
 	
-	public Sampler(Recorder source) {
+	public Sampler(InputStream source) {
 		src = source;
 		float[] h = new float[2*N];
 		for (int i = -N; i < N; i++) {
@@ -33,7 +33,7 @@ public class Sampler implements Recorder {
 		}
 		
 		buff = new float[coeffs_len];  // zeroes (by default)
-		index = 0;
+		index = width;
 		time = width + 1;
 		freq = 1f;
 	}
@@ -50,7 +50,7 @@ public class Sampler implements Recorder {
 			float[] coeffs = filt[j];		
 			for (int end = k + width; index < end; index++) {
 				System.arraycopy(buff, 1, buff, 0, buff.length - 1);
-				src.read(buff, buff.length - 1, 1);
+				src.read(buff, buff.length - 1, 1);  // push to buff's end
 			}
 			time += freq;
 			double result = 0f;
