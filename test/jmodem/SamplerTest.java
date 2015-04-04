@@ -16,7 +16,7 @@ public class SamplerTest {
 			r.buffer[i] = i;
 		}
 
-		Sampler s = new Sampler(r);
+		Sampler s = new Sampler(r, 1.0);
 		s.updateTime(0.3);
 		s.updateFreq(-0.1);
 

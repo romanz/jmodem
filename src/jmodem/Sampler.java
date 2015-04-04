@@ -16,7 +16,7 @@ public class Sampler implements InputStream {
 	private int index;
 	private final InputStream src;
 
-	public Sampler(InputStream source) {
+	public Sampler(InputStream source, double frequency) {
 		src = source;
 		double[] h = new double[2 * N];
 		for (int i = -N; i < N; i++) {
@@ -36,7 +36,7 @@ public class Sampler implements InputStream {
 		buff = new double[coeffs_len]; // zeroes (by default)
 		index = width;
 		time = width + 1;
-		freq = 1f;
+		freq = frequency;
 	}
 
 	private double sinc(double d) {
