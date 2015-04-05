@@ -1,73 +1,83 @@
 package jmodem;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.util.zip.CRC32;
 
 public class Sender {
 
-	private final float[] carrier;
+	private static final int FRAME_SIZE = 250;
 
-	private short[] symbol;
-	private byte[] word;
+	final static int symbolLength = 8;
+	final static int sampleRate = 8000;
+	final static int duration = 10; // in seconds
+	final static float scaling = 30e3f;
 
-	private OutputStream out;
+	private final java.io.OutputStream output;
+	final private short[] cos = new short[] { 1, 0, -1, 0 };
+	final private short[] sin = new short[] { 0, 1, 0, -1 };
 
-	public Sender(OutputStream o) {
-		 carrier = new float[Config.Nsym];
-		 for (int i = 0; i < carrier.length; i++) {
-			 carrier[i] = (float)Math.sin((2 * Math.PI * Config.Fc * i) / Config.Fs);
-		 }
-		 symbol = new short[carrier.length];
-		 word = new byte[2];
-		 out = o;
+	public Sender(java.io.OutputStream o) {
+		output = o;
 	}
 
-	void send(float amplitude, int n) throws IOException {
-		for (int i = 0; i < symbol.length; i++) {
-			symbol[i] = (short)(Config.SCALING * amplitude * carrier[i]);
-		}
-		for (int i = 0; i < n; i++) {
-			for (short value : symbol) {
-				word[0] = (byte)(value & 0xFF);
-				word[1] = (byte)(value >> 8);
-				out.write(word);
+	private void write(float real, float imag, int count) throws IOException {
+		for (int c = 0; c < count; c++) {
+			for (int i = 0; i < symbolLength; i++) {
+				int j = i % cos.length;
+				float v = real * cos[j] - imag * sin[j];
+				short s = (short) (scaling * v);
+				output.write(s & 0xFF);
+				output.write(s >> 8);
 			}
 		}
 	}
 
-
-	public static void main(String []args) throws IOException {
-		OutputStream out = System.out;
-		InputStream in = System.in;
-		Sender s = new Sender(new BufferedOutputStream(out, 1024));
-		
-		s.send(0f, 500);
-		s.send(1f, 400);
-		s.send(0f, 100);
-
-		int r = 0x1;
-		for (int i = 0; i < 200; ++i) {
-			r = Config.prbs(r, 16, 0x1100b);
-			s.send(2f * (r & 1) - 1, 1);
+	private void write(byte b) throws IOException {
+		for (int i = 0; i < 8; i++) {
+			int k = (b >> i) & 1;
+			write(0f, (2f * k) - 1f, 1);
 		}
-		s.send(0f, 100);
-		
-		while (true) {
-			int b = in.read();
-			if (b == -1) {
-				break;
-			}
-			for (int i = 0; i < 8; i++) {
-				int bit = (b >> i) & 1;
-				s.send(2f * bit - 1, 1);
-			}
-			
-		}
-		s.send(0f, 500);
-		out.flush();
-		out.close();
 	}
 
+	public void run(byte[] data) throws IOException {
+		write(0f, 0f, 1000);
+		write(0f, 1f, 400);
+		write(0f, 0f, 150);
+		for (int register = 0x0001, i = 0; i < 500; i++) {
+			int k = (i < 16) ? 0 : (register & 3);
+			write(cos[k], sin[k], 1);
+			register = register << 1;
+			if (register >> 16 != 0) {
+				register = register ^ 0x1100b;
+			}
+		}
+		write(0f, 0f, 100);
+
+		for (int i = 0; i <= data.length; i++) {
+			if (i % FRAME_SIZE == 0 || i == data.length) {
+				int size = Math.min(FRAME_SIZE, data.length - i);
+				write((byte) (size + 4)); // include CRC32
+
+				CRC32 crc = new CRC32();
+				crc.update(data, i, size);
+
+				ByteBuffer checksum = ByteBuffer.allocate(4);
+				checksum.putInt((int) crc.getValue());
+				for (byte b : checksum.array()) {
+					write(b);
+				}
+				if (i == data.length) {
+					break;
+				}
+			}
+			write(data[i]);
+		}
+		write(0f, 0f, 1000);
+	}
+
+	public static void main(String[] args) throws Exception {
+		Sender s = new Sender(System.out);
+		s.run(args[0].getBytes());
+	}
 }
