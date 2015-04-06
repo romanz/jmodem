@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<project name="JUNIT" default="main" basedir=".">
+    <!-- Sets variables which can later be used. -->
+    <!-- The value of a property is accessed via ${} -->
+    <property name="src.dir" location="src" />
+    <property name="test.dir" location="test" />
+
+    <property name="build.dir" location="bin" />
+    <property name="build.test.dir" location="bin/test" />
+
+    <!-- Variables used for JUnit testin -->
+
+    <property name="test.report.dir" location="junit" />
+
+    <!-- Define the classpath which includes the junit.jar and the classes after compiling-->
+    <path id="junit.class.path">
+        <pathelement location="/usr/share/eclipse/dropins/jdt/plugins/org.junit_4.8.2.dist/junit.jar"/>
+        <pathelement location="${build.dir}" />
+    </path>
+
+
+    <!-- Deletes the existing build, docs and dist directory-->
+    <target name="clean">
+        <delete dir="${build.dir}" />
+        <delete dir="${test.report.dir}" />
+    </target>
+
+    <!-- Creates the  build, docs and dist directory-->
+    <target name="makedir">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${build.test.dir}" />
+        <mkdir dir="${test.report.dir}" />
+    </target>
+
+    <!-- Compiles the java code (including the usage of library for JUnit -->
+    <target name="compile" depends="clean, makedir">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+            <classpath refid="junit.class.path" />
+        </javac>
+
+        <javac srcdir="${test.dir}" destdir="${build.test.dir}" includeantruntime="false">
+            <classpath refid="junit.class.path" />
+        </javac>
+
+    </target>
+
+    <!-- Run the JUnit Tests -->
+    <!-- Output is XML, could also be plain-->
+    <target name="junit" depends="compile">
+        <junit printsummary="on" fork="true" haltonfailure="yes">
+            <classpath refid="junit.class.path" />
+            <classpath>
+                <pathelement location="${build.test.dir}"/>
+              </classpath>
+            <formatter type="xml" />
+            <batchtest todir="${test.report.dir}">
+                <fileset dir="${test.dir}">
+                    <include name="**/*Test*.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="main" depends="compile, junit">
+        <description>Main target</description>
+    </target>
+
+</project>
