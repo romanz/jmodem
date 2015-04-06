@@ -1,6 +1,5 @@
 package jmodem;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -11,7 +10,7 @@ public class SamplerTest {
 
 	@Test
 	public void test() throws IOException {
-		BufferInputStream r = new BufferInputStream(150);
+		BufferedStream r = new BufferedStream(150);
 		for (int i = 0; i < r.buffer.length; i++) {
 			r.buffer[i] = i;
 		}
@@ -25,9 +24,10 @@ public class SamplerTest {
 				3.905555713242542, 4.790283469423569, 5.710319425568426 };
 
 		double[] result = new double[expected.length];
-		s.read(result, 0, result.length);
+		for (int i = 0; i < result.length; i++) {
+			result[i] = s.read();
+		}
 
-		assertEquals(expected.length, result.length);
 		for (int i = 0; i < result.length; i++) {
 			double err = Math.abs(expected[i] - result[i]);
 			assertTrue(err < 1e-12);

@@ -6,6 +6,11 @@ public class Complex {
 		this.imag = imagPart;
 	}
 
+	@Override
+	public String toString() {
+		return "<" + real + ", " + imag + ">";
+	}
+
 	public double real;
 	public double imag;
 }

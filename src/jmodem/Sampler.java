@@ -2,7 +2,7 @@ package jmodem;
 
 import java.io.IOException;
 
-public class Sampler implements InputStream {
+public class Sampler implements InputSampleStream {
 
 	public final int width = 128;
 	public final int resolution = 1024;
@@ -14,9 +14,10 @@ public class Sampler implements InputStream {
 	private double freq;
 	private final double[] buff;
 	private int index;
-	private final InputStream src;
+	private final InputSampleStream src;
+	private final int last_pos;
 
-	public Sampler(InputStream source, double frequency) {
+	public Sampler(InputSampleStream source, double frequency) {
 		src = source;
 		double[] h = new double[2 * N];
 		for (int i = -N; i < N; i++) {
@@ -37,6 +38,7 @@ public class Sampler implements InputStream {
 		index = width;
 		time = width + 1;
 		freq = frequency;
+		last_pos = buff.length - 1;
 	}
 
 	private double sinc(double d) {
@@ -44,22 +46,20 @@ public class Sampler implements InputStream {
 	}
 
 	@Override
-	public void read(double[] buffer, int offset, int size) throws IOException {
-		for (int o = offset; o < size; o++) {
-			int k = (int) time;
-			int j = (int) ((time - k) * resolution);
-			double[] coeffs = filt[j];
-			for (int end = k + width; index < end; index++) {
-				System.arraycopy(buff, 1, buff, 0, buff.length - 1);
-				src.read(buff, buff.length - 1, 1); // push to buff's end
-			}
-			time += freq;
-			double result = 0f;
-			for (int i = 0; i < buff.length; i++) {
-				result += (coeffs[i] * buff[i]);
-			}
-			buffer[o] = result;
+	public double read() throws IOException {
+		int k = (int) time;
+		int j = (int) ((time - k) * resolution);
+		double[] coeffs = filt[j];
+		for (int end = k + width; index < end; index++) {
+			System.arraycopy(buff, 1, buff, 0, buff.length - 1);
+			buff[last_pos] = src.read(); // push to buff's end
 		}
+		time += freq;
+		double result = 0;
+		for (int i = 0; i < buff.length; i++) {
+			result += (coeffs[i] * buff[i]);
+		}
+		return result;
 	}
 
 	public void updateTime(double dt) {

@@ -7,18 +7,21 @@ import java.util.zip.CRC32;
 
 public class Demodulator {
 
-	private final InputStream sig;
+	private final InputSampleStream sig;
 	private final Filter filt;
+	private final double scaling;
 
-	public Demodulator(InputStream signal, Filter filter) {
+	public Demodulator(InputSampleStream signal, Filter filter) {
 		sig = signal;
 		filt = filter;
+		scaling = 2.0 / Config.Nsym;
 	}
 
-	private Complex getSymbol() throws IOException {
+	Complex getSymbol() throws IOException {
 		double[] frame = new double[Config.Nsym];
-		sig.read(frame, 0, frame.length);
-		filt.process(frame);
+		for (int i = 0; i < frame.length; i++) {
+			frame[i] = filt.process(sig.read());
+		}
 
 		double real = 0;
 		double imag = 0;
@@ -26,14 +29,14 @@ public class Demodulator {
 			real += (frame[i] - frame[i + 2]);
 			imag += (frame[i + 1] - frame[i + 3]);
 		}
-		return new Complex(real, imag);
+		return new Complex(real * scaling, imag * scaling);
 	}
 
-	private int getByte() throws IOException {
+	int getByte() throws IOException {
 		int result = 0;
 		for (int i = 0; i < 8; i++) {
 			Complex sym = getSymbol();
-			int bit = (sym.imag > 0) ? 1 : 0;
+			int bit = (sym.imag > 0) ? 0 : 1;
 			result += (bit << i);
 		}
 		return result;
@@ -46,15 +49,18 @@ public class Demodulator {
 			for (int i = 0; i < len; i++) {
 				buf[i] = (byte) getByte();
 			}
-
+			len = len - Config.CHECKSUM_SIZE; // first 4 bytes are CRC
 			CRC32 crc = new CRC32();
-			crc.update(buf, 0, len - 4);
-			long expected = crc.getValue();
-			long checksum = ByteBuffer.wrap(buf, len - 4, 4).getInt();
-			if (expected != checksum) {
+			crc.update(buf, Config.CHECKSUM_SIZE, len);
+			int expected = (int) crc.getValue();
+			int got = ByteBuffer.wrap(buf, 0, Config.CHECKSUM_SIZE).getInt();
+			if (expected != got) {
 				throw new IOException("Bad checksum");
 			}
-			dst.write(buf, 0, len);
+			if (len == 0) {
+				return; // EOF
+			}
+			dst.write(buf, Config.CHECKSUM_SIZE, len);
 		}
 	}
 }

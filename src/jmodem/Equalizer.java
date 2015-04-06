@@ -6,7 +6,7 @@ public class Equalizer {
 		// TODO Auto-generated constructor stub
 	}
 
-	public InputStream run(InputStream trainingSignal) {
+	public InputSampleStream run(InputSampleStream trainingSignal) {
 		// TODO Auto-generated method stub
 		return null;
 	}

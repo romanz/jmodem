@@ -12,16 +12,14 @@ public class Filter {
 		buffer = new double[length];
 	}
 
-	public void process(double[] frame) {
-		for (int offset = 0; offset < frame.length; offset++) {
-			System.arraycopy(buffer, 1, buffer, 0, length - 1);
-			buffer[length - 1] = frame[offset];
+	public double process(double value) {
+		System.arraycopy(buffer, 1, buffer, 0, length - 1);
+		buffer[length - 1] = value;
 
-			double result = 0;
-			for (int i = 0; i < length; i++) {
-				result += (buffer[i] * coeffs[i]);
-			}
-			frame[offset] = result;
+		double result = 0;
+		for (int i = 0; i < length; i++) {
+			result += (buffer[i] * coeffs[i]);
 		}
+		return result;
 	}
 }
