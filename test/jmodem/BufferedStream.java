@@ -1,5 +1,6 @@
 package jmodem;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 public class BufferedStream implements InputSampleStream, OutputSampleStream {
@@ -24,7 +25,7 @@ public class BufferedStream implements InputSampleStream, OutputSampleStream {
 	@Override
 	public void write(double value) throws IOException {
 		if (offset >= buffer.length) {
-			throw new IOException("EOF");
+			throw new IOException("no space left");
 		}
 		buffer[offset] = value;
 		offset++;
@@ -33,7 +34,7 @@ public class BufferedStream implements InputSampleStream, OutputSampleStream {
 	@Override
 	public double read() throws IOException {
 		if (offset >= buffer.length) {
-			throw new IOException("EOF");
+			throw new EOFException();
 		}
 		double value = buffer[offset];
 		this.offset++;
