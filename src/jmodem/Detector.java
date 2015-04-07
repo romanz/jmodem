@@ -2,6 +2,7 @@ package jmodem;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 public class Detector {
 
@@ -19,7 +20,7 @@ public class Detector {
 		for (int i = 0; i < frame.length; i++) {
 			frame[i] = src.read();
 		}
-
+		
 		double real = 0;
 		double imag = 0;
 		for (int i = 0; i < frame.length; i += 4) {
@@ -56,9 +57,6 @@ public class Detector {
 				count = 0;
 			}
 		}
-		for (int i = 0; i < 100; i++) {
-			process(1); // postfix frames
-		}
 
 		int size = 0;
 		for (double[] frame : frames) {
@@ -73,18 +71,43 @@ public class Detector {
 		return buf;
 	}
 
-	private double[] optimize(double[] buf) {
-		return buf;
+	private int findStart(double[] buf) {
+		int m = 10 * Config.Nsym;
+		Vector cos = Vector.concat(Utils.zeros(m), Utils.cos(m));
+		Vector sin = Vector.concat(Utils.zeros(m), Utils.sin(m));
+		
+		double[] res = new double[buf.length - 2 * m];  
+		for (int i = 0; i < res.length; i++) {
+			Vector frame = new Vector(buf, i, 2 * m);
+			double real = frame.dot(cos);
+			double imag = frame.dot(sin);
+			double norm = frame.norm();
+			if (norm > 0) {
+				res[i] = (real * real + imag * imag) / norm;
+			}
+		}
+		int offset = Utils.argmax(res);
+		return offset + m; 
 	}
 
-	public InputSampleStream run() throws IOException {
+	private double[] readPrefix(double[] buf, int start) throws IOException {
+		double[] prefix = Utils.zeros(Sender.prefixLength * Config.Nsym);		
+		int toCopy = buf.length - start;
+		
+		System.arraycopy(buf, start, prefix, 0, toCopy);
+		for (int i = toCopy; i < prefix.length; i++) {
+			prefix[i] = src.read();
+		}
+		return prefix;
+	}
+
+	public double[] run() throws IOException {
 		double[] buf = detect();
-		buf = optimize(buf);
-		return null;
+		int start = findStart(buf);
+		return readPrefix(buf, start);
 	}
-
+	
 	public double frequencyError() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

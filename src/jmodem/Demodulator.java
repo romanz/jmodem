@@ -17,10 +17,13 @@ public class Demodulator {
 		scaling = 2.0 / Config.Nsym;
 	}
 
-	Complex getSymbol() throws IOException {
+	public Complex getSymbol() throws IOException {
 		double[] frame = new double[Config.Nsym];
 		for (int i = 0; i < frame.length; i++) {
-			frame[i] = filt.process(sig.read());
+			frame[i] = sig.read();
+			if (filt != null) {
+				frame[i] = filt.process(frame[i]);
+			}
 		}
 
 		double real = 0;
@@ -31,13 +34,22 @@ public class Demodulator {
 		}
 		return new Complex(real * scaling, imag * scaling);
 	}
+	
+	public Complex[] getSymbols(int n) throws IOException {
+		Complex[] symbols = new Complex[n];
+		for (int i = 0; i < n; i++) {
+			symbols[i] = getSymbol();
+		}
+		return symbols;
+	}
 
-	int getByte() throws IOException {
+	public int getByte() throws IOException {
 		int result = 0;
-		for (int i = 0; i < 8; i++) {
-			Complex sym = getSymbol();
-			int bit = (sym.imag > 0) ? 0 : 1;
+		int i = 0;
+		for (Complex symbol : getSymbols(8)) {
+			int bit = (symbol.imag > 0) ? 0 : 1;
 			result += (bit << i);
+			i++;
 		}
 		return result;
 	}

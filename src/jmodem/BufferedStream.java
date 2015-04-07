@@ -14,7 +14,7 @@ public class BufferedStream implements InputSampleStream, OutputSampleStream {
 	}
 
 	public BufferedStream(double[] b) {
-		buffer = b.clone();
+		buffer = b;
 		reset();
 	}
 

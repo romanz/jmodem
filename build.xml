@@ -44,7 +44,7 @@
     <!-- Run the JUnit Tests -->
     <!-- Output is XML, could also be plain-->
     <target name="junit" depends="compile">
-        <junit printsummary="on" fork="true" haltonfailure="yes">
+        <junit printsummary="on" fork="true">
             <classpath refid="junit.class.path" />
             <classpath>
                 <pathelement location="${build.test.dir}"/>
