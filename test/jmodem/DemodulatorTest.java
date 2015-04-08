@@ -41,7 +41,9 @@ public class DemodulatorTest {
 		BufferedStream b = new BufferedStream(1024 * 16);
 		Sender s = new Sender(b);
 		byte[] data = new byte[] { 42, -100, -1, 0 };
-		s.writeData(data);
+		s.writeData(data, data.length);
+		s.flush();
+		
 		b.reset();
 
 		Demodulator d = new Demodulator(b, new Filter(new double[] { 1 }));

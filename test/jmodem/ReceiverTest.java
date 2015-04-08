@@ -16,12 +16,12 @@ public class ReceiverTest {
 		Sender s = new Sender(b);
 		s.writePrefix();
 		s.writeTraining();
-		s.writeData(bytes);
+		s.writeData(bytes, bytes.length);
+		s.flush();
 		
 		b.reset();
-		Receiver r = new Receiver();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		r.run(b, out);
+		Receiver.run(b, out);
 		
 		assertArrayEquals(bytes, out.toByteArray());
 	}

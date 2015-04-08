@@ -12,7 +12,7 @@ public class Sender {
 	final static int symbolLength = 8;
 	final static int sampleRate = 8000;
 	
-	final static float scaling = 30e3f;
+	final static double scaling = 30e3;
 
 	final static private short[] cos = new short[] { 1, 0, -1, 0, 1, 0, -1, 0 };
 	final static private short[] sin = new short[] { 0, 1, 0, -1, 0, 1, 0, -1 };
@@ -47,15 +47,19 @@ public class Sender {
 			writeSymbols(0f, 1f - (2f * k), 1);
 		}
 	}
+	
+	public void writeSilence(int n) throws IOException {
+		writeSymbols(0f, 0f, n);
+	}
 
 	public void writePrefix() throws IOException {
-		writeSymbols(0f, 0f, 1000);
+		writeSilence(1000);
 		writeSymbols(0f, -1f, 400);
-		writeSymbols(0f, 0f, 50);
+		writeSilence(50);
 	}	
 	
 	public void writeTraining() throws IOException {
-		writeSymbols(0f, 0f, 100);
+		writeSilence(100);
 		for (int register = 0x0001, i = 0; i < 500; i++) {
 			int k = (i < 16) ? 0 : (register & 3);
 			writeSymbols(cos[k], -sin[k], 1);
@@ -64,33 +68,38 @@ public class Sender {
 				register = register ^ 0x1100b;
 			}
 		}
-		writeSymbols(0f, 0f, 100);
+		writeSilence(100);
 	}
 
-	public void writeData(byte[] data) throws IOException {
+	public void writeData(byte[] data, int length) throws IOException {
 
-		for (int i = 0; i <= data.length; i++) {
-			if (i % FrameSize == 0 || i == data.length) {
-				int size = Math.min(FrameSize, data.length - i);
-				writeByte((byte) (size + 4)); // include CRC32
-
-				CRC32 crc = new CRC32();
-				crc.update(data, i, size);
-
-				ByteBuffer checksum = ByteBuffer.allocate(4);
-				checksum.putInt((int) crc.getValue());
-				for (byte b : checksum.array()) {
-					writeByte(b);
-				}
-				if (i == data.length) {
-					break;
-				}
+		for (int i = 0; i < length; i++) {
+			if (i % FrameSize == 0) {
+				int size = Math.min(FrameSize, length - i);
+				writeChecksum(data, i, size);
 			}
 			writeByte(data[i]);
 		}
-		writeSymbols(0f, 0f, 1000);
+	}
+	
+	public void writeChecksum(byte[] data, int offset, int size) throws IOException{
+		writeByte((byte) (size + 4)); // include CRC32
+
+		CRC32 crc = new CRC32();
+		if (data != null) {
+			crc.update(data, offset, size);
+		}
+
+		ByteBuffer checksum = ByteBuffer.allocate(4);
+		checksum.putInt((int) crc.getValue());
+		for (byte b : checksum.array()) {
+			writeByte(b);
+		}
 	}
 
+	public void flush() throws IOException {
+		writeChecksum(null, 0, 0);		
+	}
 	static class OutputStreamWrapper implements OutputSampleStream {
 
 		OutputStream output;
@@ -111,6 +120,16 @@ public class Sender {
 		Sender s = new Sender(new OutputStreamWrapper(System.out));
 		s.writePrefix();
 		s.writeTraining();
-		s.writeData("foo bax\nnoop\n".getBytes());
+		byte[] buf = new byte[1000];
+		while (true) {
+			int read = System.in.read(buf);
+			if (read == -1) {
+				break;
+			}
+			s.writeData(buf, read);
+		}		
+		s.writeChecksum(null, 0, 0);
+		s.writeSilence(1000);
 	}
+
 }
