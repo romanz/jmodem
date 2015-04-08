@@ -10,8 +10,6 @@
 
     <!-- Variables used for JUnit testin -->
 
-    <property name="test.report.dir" location="junit" />
-
     <!-- Define the classpath which includes the junit.jar and the classes after compiling-->
     <path id="junit.class.path">
         <pathelement location="/usr/share/eclipse/dropins/jdt/plugins/org.junit_4.8.2.dist/junit.jar"/>
@@ -29,7 +27,6 @@
     <target name="makedir">
         <mkdir dir="${build.dir}" />
         <mkdir dir="${build.test.dir}" />
-        <mkdir dir="${test.report.dir}" />
     </target>
 
     <!-- Compiles the java code (including the usage of library for JUnit -->
@@ -44,13 +41,13 @@
     <!-- Run the JUnit Tests -->
     <!-- Output is XML, could also be plain-->
     <target name="junit" depends="compile">
-        <junit printsummary="on" fork="true">
+        <junit printsummary="off" fork="true">
             <classpath refid="junit.class.path" />
             <classpath>
                 <pathelement location="${build.test.dir}"/>
               </classpath>
-            <formatter type="plain" />
-            <batchtest todir="${test.report.dir}">
+            <formatter type="plain" usefile="false"/>
+            <batchtest>
                 <fileset dir="${test.dir}">
                     <include name="**/*Test*.java" />
                 </fileset>

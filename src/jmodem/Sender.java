@@ -52,7 +52,7 @@ public class Sender {
 		writeSymbols(0f, 0f, 1000);
 		writeSymbols(0f, -1f, 400);
 		writeSymbols(0f, 0f, 50);
-	}
+	}	
 	
 	public void writeTraining() throws IOException {
 		writeSymbols(0f, 0f, 100);

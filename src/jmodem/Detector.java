@@ -104,6 +104,7 @@ public class Detector {
 		double[] buf = detect();
 		int start = findStart(buf);
 		return readPrefix(buf, start);
+		// TODO: estimate frequency error
 	}
 	
 	public double frequencyError() {

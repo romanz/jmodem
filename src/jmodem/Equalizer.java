@@ -22,11 +22,18 @@ public class Equalizer {
 		sender.writeTraining();
 		
 		Filter filt = train(signal, expected);
-		for (double sample : signal) {
-			filt.process(sample);
+		
+		double[] filtered = Utils.zeros(signal.length + lookahead);
+		for (int i = 0; i < signal.length; i++) {
+			filtered[i] = filt.process(signal[i]);
 		}
 		for (int i = 0; i < lookahead; i++) {
-			filt.process(s.read());
+			filtered[i + signal.length] = filt.process(s.read());
+		}
+		Demodulator d = new Demodulator(new BufferedStream(filtered), null);
+		for (int i = 0; i < Sender.trainingSymbols; i++) {
+			d.getSymbol();
+			// TODO: verify training sequence
 		}
 		return filt;
 	}
