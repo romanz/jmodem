@@ -37,5 +37,8 @@ public class Utils {
 		}
 		return signal;
 	}
+	public static void log(String s) {
+		System.err.println(s);
+	}
 
 }
