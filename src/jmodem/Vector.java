@@ -4,7 +4,7 @@ public class Vector {
 
 	private final double[] data;
 	private final int offset;
-	private final int size;
+	public final int size;
 
 	public Vector(double[] data, int offset, int size) {
 		this.data = data;

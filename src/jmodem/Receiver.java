@@ -9,12 +9,12 @@ public class Receiver {
 		Detector d = new Detector(src);
 		d.run();
 		
-		double freq = 1 / (1 + d.frequencyError());
-		Equalizer eq = new Equalizer(20, 10);
-		eq.run(src);
-		
-		Filter filt = eq.train();
+		double freq = 1.0 / (1 + d.frequencyError());
+		Equalizer eq = new Equalizer(9, 8);
+		Filter filt = eq.run(src);
+				
 		Demodulator r = new Demodulator(new Sampler(src, freq), filt);
 		r.run(dst);
 	}
+	
 }
