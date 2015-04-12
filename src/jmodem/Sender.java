@@ -1,8 +1,10 @@
 package jmodem;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.zip.CRC32;
 
 public class Sender {
@@ -87,17 +89,21 @@ public class Sender {
 
 	static class OutputStreamWrapper implements OutputSampleStream {
 
-		OutputStream output;
+		DataOutputStream output;
+		byte[] blob = new byte[2];
+		ByteBuffer buf;
 
 		public OutputStreamWrapper(OutputStream o) {
-			output = o;
+			output = new DataOutputStream(o);
+			buf = ByteBuffer.wrap(blob).order(ByteOrder.LITTLE_ENDIAN);
 		}
 
 		@Override
-		public void write(double v) throws IOException {
-			short s = (short) (Config.scaling * v);
-			output.write(s & 0xFF);
-			output.write(s >> 8);
+		public void write(double value) throws IOException {
+			short sample = (short) (Config.scalingFactor * value);
+			buf.rewind();
+			buf.putShort(sample);
+			output.write(blob);
 		}
 	}
 
