@@ -25,7 +25,7 @@ public class Receiver {
 	static class InputStreamWrapper implements InputSampleStream {
 
 		DataInputStream input;
-		byte[] blob = new byte[4096];
+		byte[] blob = new byte[Config.fileBufferSize];
 		ByteBuffer buf;
 
 		public InputStreamWrapper(InputStream i) {

@@ -9,8 +9,8 @@ import java.util.zip.CRC32;
 
 public class Sender {
 
-	final static private short[] cos = new short[] { 1, 0, -1, 0, 1, 0, -1, 0 };
-	final static private short[] sin = new short[] { 0, 1, 0, -1, 0, 1, 0, -1 };
+	final private static double[] cos = Utils.cos(Config.symbolLength);
+	final private static double[] sin = Utils.sin(Config.symbolLength);
 
 	private final OutputSampleStream output;
 
@@ -18,7 +18,7 @@ public class Sender {
 		output = o;
 	}
 
-	void writeSymbols(float real, float imag, int count) throws IOException {
+	void writeSymbols(double real, double imag, int count) throws IOException {
 		for (int c = 0; c < count; c++) {
 			for (int i = 0; i < Config.symbolLength; i++) {
 				output.write(real * cos[i] + imag * sin[i]);
@@ -69,28 +69,29 @@ public class Sender {
 
 	public void writeChecksum(byte[] data, int offset, int size)
 			throws IOException {
-		writeByte((byte) (size + 4)); // include CRC32
+		writeByte((byte) (size + Config.checksumSize));
 
 		CRC32 crc = new CRC32();
 		if (data != null) {
 			crc.update(data, offset, size);
 		}
 
-		ByteBuffer checksum = ByteBuffer.allocate(4);
+		ByteBuffer checksum = ByteBuffer.allocate(Config.checksumSize);
 		checksum.putInt((int) crc.getValue());
 		for (byte b : checksum.array()) {
 			writeByte(b);
 		}
 	}
 
-	public void flush() throws IOException {
+	public void writeEOF() throws IOException {
 		writeChecksum(null, 0, 0);
+		writeSilence(1000);
 	}
 
 	static class OutputStreamWrapper implements OutputSampleStream {
 
 		DataOutputStream output;
-		byte[] blob = new byte[2];
+		byte[] blob = new byte[Config.fileBufferSize];
 		ByteBuffer buf;
 
 		public OutputStreamWrapper(OutputStream o) {
@@ -100,18 +101,25 @@ public class Sender {
 
 		@Override
 		public void write(double value) throws IOException {
+			if (buf.remaining() == 0) {
+				flush();
+			}
 			short sample = (short) (Config.scalingFactor * value);
-			buf.rewind();
 			buf.putShort(sample);
-			output.write(blob);
+		}
+
+		void flush() throws IOException {
+			output.write(blob, 0, buf.position());
+			buf.rewind();
 		}
 	}
 
 	public static void main(String[] args) throws Exception {
-		Sender s = new Sender(new OutputStreamWrapper(System.out));
+		OutputStreamWrapper out = new OutputStreamWrapper(System.out);
+		Sender s = new Sender(out);
 		s.writePrefix();
 		s.writeTraining();
-		byte[] buf = new byte[1000];
+		byte[] buf = new byte[Config.fileBufferSize];
 		while (true) {
 			int read = System.in.read(buf);
 			if (read == -1) {
@@ -119,8 +127,6 @@ public class Sender {
 			}
 			s.writeData(buf, read);
 		}
-		s.writeChecksum(null, 0, 0);
-		s.writeSilence(1000);
+		s.writeEOF();
 	}
-
 }

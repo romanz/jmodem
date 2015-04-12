@@ -42,8 +42,8 @@ public class DemodulatorTest {
 		Sender s = new Sender(b);
 		byte[] data = new byte[] { 42, -100, -1, 0 };
 		s.writeData(data, data.length);
-		s.flush();
-		
+		s.writeEOF();
+
 		b.reset();
 
 		Demodulator d = new Demodulator(b, new Filter(new double[] { 1 }));

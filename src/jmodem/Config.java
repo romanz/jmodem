@@ -20,4 +20,6 @@ public class Config {
 
 	final static int trainingLength = trainingSilence * 2 + trainingSymbols;
 
+	final static int fileBufferSize = 4096;
+
 }
