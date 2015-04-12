@@ -1,9 +1,11 @@
 package jmodem;
 
-import java.io.EOFException;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class Receiver {
 
@@ -12,38 +14,38 @@ public class Receiver {
 		d.run();
 		src = new Sampler(src, 1.0 / (1 + d.frequencyError()));
 		// TODO: verify prefix after fixing frequency drift
-		
+
 		Equalizer eq = new Equalizer(9, 8);
 		Filter filt = eq.run(src);
-				
+
 		Demodulator r = new Demodulator(src, filt);
 		r.run(dst);
 	}
-	
+
 	static class InputStreamWrapper implements InputSampleStream {
 
-		InputStream input;
+		DataInputStream input;
+		byte[] blob = new byte[4096];
+		ByteBuffer buf;
 
 		public InputStreamWrapper(InputStream i) {
-			input = i;
+			input = new DataInputStream(i);
+			buf = ByteBuffer.wrap(blob).order(ByteOrder.LITTLE_ENDIAN);
 		}
 
 		@Override
 		public double read() throws IOException {
-			int lsb = input.read();
-			int msb = input.read();
-			if (lsb == -1 || msb == -1) {
-				throw new EOFException();
+			if (buf.hasRemaining() == false) {
+				buf.clear();
+				input.readFully(blob);
 			}
-			int s = lsb + msb << 8;
-			return s / (double)Sender.scaling;
+			return buf.getShort() / Sender.scaling;
 		}
 	}
 
-	
 	public static void main(String[] args) throws Exception {
 		InputSampleStream src = new InputStreamWrapper(System.in);
 		run(src, System.out);
 	}
-	
+
 }
