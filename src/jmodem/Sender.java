@@ -7,35 +7,18 @@ import java.util.zip.CRC32;
 
 public class Sender {
 
-	private static final int FrameSize = 250;
-
-	final static int symbolLength = 8;
-	final static int sampleRate = 8000;
-	
-	final static double scaling = 30e3;
-
 	final static private short[] cos = new short[] { 1, 0, -1, 0, 1, 0, -1, 0 };
 	final static private short[] sin = new short[] { 0, 1, 0, -1, 0, 1, 0, -1 };
-	
-	final static int prefixSymbols = 400;
-	final static int prefixSilence = 50;
-	final static int prefixLength = prefixSymbols + prefixSilence;
 
-	final static int trainingSilence = 100;
-	final static int trainingSymbols = 500;
-	final static int trainingConstant = 16;
-
-	final static int trainingLength = trainingSilence * 2 + trainingSymbols;
-	
 	private final OutputSampleStream output;
-	
+
 	public Sender(OutputSampleStream o) {
 		output = o;
 	}
 
 	void writeSymbols(float real, float imag, int count) throws IOException {
 		for (int c = 0; c < count; c++) {
-			for (int i = 0; i < symbolLength; i++) {
+			for (int i = 0; i < Config.symbolLength; i++) {
 				output.write(real * cos[i] + imag * sin[i]);
 			}
 		}
@@ -47,7 +30,7 @@ public class Sender {
 			writeSymbols(0f, 1f - (2f * k), 1);
 		}
 	}
-	
+
 	public void writeSilence(int n) throws IOException {
 		writeSymbols(0f, 0f, n);
 	}
@@ -56,8 +39,8 @@ public class Sender {
 		writeSilence(1000);
 		writeSymbols(0f, -1f, 400);
 		writeSilence(50);
-	}	
-	
+	}
+
 	public void writeTraining() throws IOException {
 		writeSilence(100);
 		for (int register = 0x0001, i = 0; i < 500; i++) {
@@ -74,15 +57,16 @@ public class Sender {
 	public void writeData(byte[] data, int length) throws IOException {
 
 		for (int i = 0; i < length; i++) {
-			if (i % FrameSize == 0) {
-				int size = Math.min(FrameSize, length - i);
+			if (i % Config.frameSize == 0) {
+				int size = Math.min(Config.frameSize, length - i);
 				writeChecksum(data, i, size);
 			}
 			writeByte(data[i]);
 		}
 	}
-	
-	public void writeChecksum(byte[] data, int offset, int size) throws IOException{
+
+	public void writeChecksum(byte[] data, int offset, int size)
+			throws IOException {
 		writeByte((byte) (size + 4)); // include CRC32
 
 		CRC32 crc = new CRC32();
@@ -98,8 +82,9 @@ public class Sender {
 	}
 
 	public void flush() throws IOException {
-		writeChecksum(null, 0, 0);		
+		writeChecksum(null, 0, 0);
 	}
+
 	static class OutputStreamWrapper implements OutputSampleStream {
 
 		OutputStream output;
@@ -110,7 +95,7 @@ public class Sender {
 
 		@Override
 		public void write(double v) throws IOException {
-			short s = (short) (scaling * v);
+			short s = (short) (Config.scaling * v);
 			output.write(s & 0xFF);
 			output.write(s >> 8);
 		}
@@ -127,7 +112,7 @@ public class Sender {
 				break;
 			}
 			s.writeData(buf, read);
-		}		
+		}
 		s.writeChecksum(null, 0, 0);
 		s.writeSilence(1000);
 	}

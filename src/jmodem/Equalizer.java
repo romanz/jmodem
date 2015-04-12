@@ -13,16 +13,16 @@ public class Equalizer {
 	}
 
 	public Filter run(InputSampleStream s) throws IOException {
-		int size = Config.Nsym * Sender.trainingLength;
+		int size = Config.Nsym * Config.trainingLength;
 		double[] signal = Utils.take(s, size);
-		
-		double[] expected = Utils.zeros(size); 
+
+		double[] expected = Utils.zeros(size);
 		BufferedStream stream = new BufferedStream(expected);
 		Sender sender = new Sender(stream);
 		sender.writeTraining();
-		
+
 		Filter filt = train(signal, expected);
-		
+
 		double[] filtered = Utils.zeros(signal.length + lookahead);
 		for (int i = 0; i < signal.length; i++) {
 			filtered[i] = filt.process(signal[i]);
@@ -31,7 +31,7 @@ public class Equalizer {
 			filtered[i + signal.length] = filt.process(s.read());
 		}
 		Demodulator d = new Demodulator(new BufferedStream(filtered), null);
-		for (int i = 0; i < Sender.trainingSymbols; i++) {
+		for (int i = 0; i < Config.trainingSymbols; i++) {
 			d.getSymbol();
 			// TODO: verify training sequence
 		}
@@ -47,13 +47,13 @@ public class Equalizer {
 		final int N = order + lookahead;
 		double[] Rxx = Utils.zeros(N);
 		double[] Rxy = Utils.zeros(N);
-		
+
 		for (int i = 0; i < N; i++) {
-			Vector x_ = x.slice(0, L-i);
+			Vector x_ = x.slice(0, L - i);
 			Rxx[i] = x.slice(i, L).dot(x_);
 			Rxy[i] = y.slice(i, L).dot(x_);
 		}
-		
+
 		return new Filter(Levinson.solver(Rxx, Rxy));
 	}
 

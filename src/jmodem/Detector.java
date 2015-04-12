@@ -19,7 +19,7 @@ public class Detector {
 		for (int i = 0; i < frame.length; i++) {
 			frame[i] = src.read();
 		}
-		
+
 		double real = 0;
 		double imag = 0;
 		for (int i = 0; i < frame.length; i += 4) {
@@ -74,8 +74,8 @@ public class Detector {
 		int m = 10 * Config.Nsym;
 		Vector cos = Vector.concat(Utils.zeros(m), Utils.cos(m));
 		Vector sin = Vector.concat(Utils.zeros(m), Utils.sin(m));
-		
-		double[] res = new double[buf.length - 2 * m];  
+
+		double[] res = new double[buf.length - 2 * m];
 		for (int i = 0; i < res.length; i++) {
 			Vector frame = new Vector(buf, i, 2 * m);
 			double real = frame.dot(cos);
@@ -86,13 +86,13 @@ public class Detector {
 			}
 		}
 		int offset = Utils.argmax(res);
-		return offset + m; 
+		return offset + m;
 	}
 
 	private double[] readPrefix(double[] buf, int start) throws IOException {
-		double[] prefix = Utils.zeros(Sender.prefixLength * Config.Nsym);		
+		double[] prefix = Utils.zeros(Config.prefixLength * Config.Nsym);
 		int toCopy = buf.length - start;
-		
+
 		System.arraycopy(buf, start, prefix, 0, toCopy);
 		for (int i = toCopy; i < prefix.length; i++) {
 			prefix[i] = src.read();
@@ -106,7 +106,7 @@ public class Detector {
 		return readPrefix(buf, start);
 		// TODO: estimate frequency error
 	}
-	
+
 	public double frequencyError() {
 		return 0;
 	}
