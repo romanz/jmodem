@@ -13,3 +13,5 @@ check
 amodem send -q -i data.tx -l- -o audio.tx
 java -cp bin jmodem.Receiver <audio.tx >data.rx
 check
+
+rm data.rx data.tx audio.tx
