@@ -39,7 +39,7 @@ public class Receiver {
 				buf.clear();
 				input.readFully(blob);
 			}
-			return buf.getShort() / Config.scaling;
+			return buf.getShort() / Config.scalingFactor;
 		}
 	}
 

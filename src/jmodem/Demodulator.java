@@ -14,11 +14,11 @@ public class Demodulator {
 	public Demodulator(InputSampleStream signal, Filter filter) {
 		sig = signal;
 		filt = filter;
-		scaling = 2.0 / Config.Nsym;
+		scaling = 2.0 / Config.symbolLength;
 	}
 
 	public Complex getSymbol() throws IOException {
-		double[] frame = new double[Config.Nsym];
+		double[] frame = new double[Config.symbolLength];
 		for (int i = 0; i < frame.length; i++) {
 			frame[i] = sig.read();
 			if (filt != null) {
@@ -34,7 +34,7 @@ public class Demodulator {
 		}
 		return new Complex(real * scaling, imag * scaling);
 	}
-	
+
 	public Complex[] getSymbols(int n) throws IOException {
 		Complex[] symbols = new Complex[n];
 		for (int i = 0; i < n; i++) {
@@ -61,18 +61,18 @@ public class Demodulator {
 			for (int i = 0; i < len; i++) {
 				buf[i] = (byte) getByte();
 			}
-			len = len - Config.CHECKSUM_SIZE; // first 4 bytes are CRC
+			len = len - Config.checksumSize; // first 4 bytes are CRC
 			CRC32 crc = new CRC32();
-			crc.update(buf, Config.CHECKSUM_SIZE, len);
+			crc.update(buf, Config.checksumSize, len);
 			int expected = (int) crc.getValue();
-			int got = ByteBuffer.wrap(buf, 0, Config.CHECKSUM_SIZE).getInt();
+			int got = ByteBuffer.wrap(buf, 0, Config.checksumSize).getInt();
 			if (expected != got) {
 				throw new IOException("Bad checksum");
 			}
 			if (len == 0) {
 				return; // EOF
 			}
-			dst.write(buf, Config.CHECKSUM_SIZE, len);
+			dst.write(buf, Config.checksumSize, len);
 		}
 	}
 }

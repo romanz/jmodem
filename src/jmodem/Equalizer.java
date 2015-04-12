@@ -13,7 +13,7 @@ public class Equalizer {
 	}
 
 	public Filter run(InputSampleStream s) throws IOException {
-		int size = Config.Nsym * Config.trainingLength;
+		int size = Config.symbolLength * Config.trainingLength;
 		double[] signal = Utils.take(s, size);
 
 		double[] expected = Utils.zeros(size);

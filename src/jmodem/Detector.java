@@ -15,7 +15,7 @@ public class Detector {
 	}
 
 	boolean process(double threshold) throws IOException {
-		double[] frame = new double[Config.Nsym];
+		double[] frame = new double[Config.symbolLength];
 		for (int i = 0; i < frame.length; i++) {
 			frame[i] = src.read();
 		}
@@ -71,7 +71,7 @@ public class Detector {
 	}
 
 	private int findStart(double[] buf) {
-		int m = 10 * Config.Nsym;
+		int m = 10 * Config.symbolLength;
 		Vector cos = Vector.concat(Utils.zeros(m), Utils.cos(m));
 		Vector sin = Vector.concat(Utils.zeros(m), Utils.sin(m));
 
@@ -90,7 +90,8 @@ public class Detector {
 	}
 
 	private double[] readPrefix(double[] buf, int start) throws IOException {
-		double[] prefix = Utils.zeros(Config.prefixLength * Config.Nsym);
+		int size = Config.prefixLength * Config.symbolLength;
+		double[] prefix = Utils.zeros(size);
 		int toCopy = buf.length - start;
 
 		System.arraycopy(buf, start, prefix, 0, toCopy);
