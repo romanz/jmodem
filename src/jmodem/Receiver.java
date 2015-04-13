@@ -12,7 +12,8 @@ public class Receiver {
 	static void run(InputSampleStream src, OutputStream dst) throws IOException {
 		Detector d = new Detector(src);
 		d.run();
-		src = new Sampler(src, 1.0 / (1 + d.frequencyError()));
+		double freq = 1.0 / (1 + d.frequencyDrift());
+		src = new Sampler(src, freq);
 		// TODO: verify prefix after fixing frequency drift
 
 		Equalizer eq = new Equalizer(9, 8);

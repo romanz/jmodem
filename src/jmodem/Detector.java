@@ -8,6 +8,7 @@ public class Detector {
 	private final InputSampleStream src;
 	private final ArrayDeque<double[]> frames;
 	private final int bufsize = 1000;
+	private double drift;
 
 	public Detector(InputSampleStream s) {
 		src = s;
@@ -104,12 +105,33 @@ public class Detector {
 	public double[] run() throws IOException {
 		double[] buf = detect();
 		int start = findStart(buf);
-		return readPrefix(buf, start);
-		// TODO: estimate frequency error
+		double[] prefix = readPrefix(buf, start);
+		drift = estimateDrift(prefix);
+		return prefix;
 	}
 
-	public double frequencyError() {
-		return 0;
+	double estimateDrift(double[] prefix) throws IOException {
+		Demodulator d = new Demodulator(new BufferedStream(prefix), null);
+		Complex[] symbols = d.getSymbols(Config.prefixSymbols);
+
+		final int skip = 5;
+		double sum = 0.0;
+		int count = 0;
+		for (int i = skip + 1; i < symbols.length - skip; i++) {
+			Complex z1 = symbols[i - 1];
+			Complex z2 = symbols[i];
+			// Compute "delta" phase of (z2' * z1)
+			double real = z1.real * z2.real + z1.imag * z2.imag;
+			double imag = z1.imag * z2.real - z1.real * z2.imag;
+			sum += Math.atan2(imag, real);
+			count++;
+		}
+		double avgDrift = sum / count;
+		return avgDrift * Config.baudRate / (2 * Math.PI * Config.carrierFreq);
+	}
+
+	public double frequencyDrift() {
+		return drift;
 	}
 
 }

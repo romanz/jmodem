@@ -7,6 +7,8 @@ public class Config {
 
 	final static int symbolLength = 8;
 	final static int sampleRate = 8000;
+	final static int carrierFreq = 2000;
+	final static int baudRate = sampleRate / symbolLength;
 
 	final static double scalingFactor = 30e3;
 
