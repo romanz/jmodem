@@ -11,23 +11,17 @@ public class Vector {
 		this.offset = offset;
 		this.size = size;
 	}
-	
-	public Vector(double[] data, int offset) {
-		this.data = data;
-		this.offset = offset;
-		this.size = data.length;
-	}
-	
+
 	public Vector(double[] data) {
 		this.data = data;
 		this.offset = 0;
 		this.size = data.length;
 	}
-	
+
 	public Vector slice(int begin, int end) {
 		return new Vector(data, begin, end - begin);
 	}
-	
+
 	public static Vector concat(double[] ...vs) {
 		int total = 0;
 		for (double[] v : vs) {
@@ -39,11 +33,11 @@ public class Vector {
 			for (double e : v) {
 				data[i] = e;
 				i++;
-			}		
+			}
 		}
 		return new Vector(data);
 	}
-	
+
 	double dot(Vector v) {
 		assert(v.size == this.size);
 		double res = 0;
@@ -52,7 +46,7 @@ public class Vector {
 		}
 		return res;
 	}
-	
+
 	double power() {
 		double res = 0;
 		for (int i = 0; i < size; i++) {
@@ -61,9 +55,9 @@ public class Vector {
 		}
 		return res;
 	}
-	
+
 	double norm() {
 		return Math.sqrt(power());
 	}
-	
+
 }
