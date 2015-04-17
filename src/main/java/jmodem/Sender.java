@@ -99,7 +99,6 @@ public class Sender {
 			buf = ByteBuffer.wrap(blob).order(ByteOrder.LITTLE_ENDIAN);
 		}
 
-		@Override
 		public void write(double value) throws IOException {
 			if (buf.remaining() == 0) {
 				flush();

@@ -34,7 +34,6 @@ public class Receiver {
 			buf = ByteBuffer.wrap(blob).order(ByteOrder.LITTLE_ENDIAN);
 		}
 
-		@Override
 		public double read() throws IOException {
 			if (buf.hasRemaining() == false) {
 				buf.clear();

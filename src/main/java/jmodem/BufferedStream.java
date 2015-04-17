@@ -22,7 +22,6 @@ public class BufferedStream implements InputSampleStream, OutputSampleStream {
 		offset = 0;
 	}
 
-	@Override
 	public void write(double value) throws IOException {
 		if (offset >= buffer.length) {
 			throw new IOException("no space left");
@@ -31,7 +30,6 @@ public class BufferedStream implements InputSampleStream, OutputSampleStream {
 		offset++;
 	}
 
-	@Override
 	public double read() throws IOException {
 		if (offset >= buffer.length) {
 			throw new EOFException();

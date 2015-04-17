@@ -45,7 +45,6 @@ public class Sampler implements InputSampleStream {
 		return d != 0 ? Math.sin(d) / d : 1.0;
 	}
 
-	@Override
 	public double read() throws IOException {
 		int k = (int) time;
 		int j = (int) ((time - k) * resolution);
