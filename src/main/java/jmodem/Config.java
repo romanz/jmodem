@@ -2,15 +2,15 @@ package jmodem;
 
 public class Config {
 
-	final static int checksumSize = 4;
-	final static int frameSize = 250;
+	public final static double scalingFactor = 30e3;
+	public final static int sampleRate = 8000;
 
 	final static int symbolLength = 8;
-	final static int sampleRate = 8000;
 	final static int carrierFreq = 2000;
 	final static int baudRate = sampleRate / symbolLength;
 
-	final static double scalingFactor = 30e3;
+	final static int checksumSize = 4;
+	final static int frameSize = 250;
 
 	final static int prefixSymbols = 400;
 	final static int prefixSilence = 50;

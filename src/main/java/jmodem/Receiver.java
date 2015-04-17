@@ -9,7 +9,7 @@ import java.nio.ByteOrder;
 
 public class Receiver {
 
-	static void run(InputSampleStream src, OutputStream dst) throws IOException {
+	public static void run(InputSampleStream src, OutputStream dst) throws IOException {
 		Detector d = new Detector(src);
 		d.run();
 		double freq = 1.0 / (1 + d.frequencyDrift());
