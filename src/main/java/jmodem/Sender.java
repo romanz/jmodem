@@ -38,7 +38,7 @@ public class Sender {
 	}
 
 	public void writePrefix() throws IOException {
-		writeSilence(1000);
+		writeSilence(50);
 		writeSymbols(0f, -1f, 400);
 		writeSilence(50);
 	}
