@@ -67,7 +67,7 @@ public class Demodulator {
 			int expected = (int) crc.getValue();
 			int got = ByteBuffer.wrap(buf, 0, Config.checksumSize).getInt();
 			if (expected != got) {
-				throw new IOException("Bad checksum");
+				throw new IOException("bad checksum");
 			}
 			if (len == 0) {
 				return; // EOF
