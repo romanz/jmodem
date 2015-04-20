@@ -85,7 +85,7 @@ public class Sender {
 
 	public void writeEOF() throws IOException {
 		writeChecksum(null, 0, 0);
-		writeSilence(1000);
+		writeSilence(100);
 	}
 
 	static class OutputStreamWrapper implements OutputSampleStream {
