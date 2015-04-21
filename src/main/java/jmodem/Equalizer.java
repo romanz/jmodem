@@ -18,8 +18,8 @@ public class Equalizer {
 
 		double[] expected = Utils.zeros(size);
 		BufferedStream stream = new BufferedStream(expected);
-		Sender sender = new Sender(stream);
-		sender.writeTraining();
+		Modulator m = new Modulator(stream);
+		m.writeTraining();
 
 		Filter filt = train(signal, expected);
 

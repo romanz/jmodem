@@ -24,10 +24,10 @@ public class DemodulatorTest {
 	@Test
 	public void testByte() throws IOException {
 		BufferedStream b = new BufferedStream(1024);
-		Sender s = new Sender(b);
+		Modulator m = new Modulator(b);
 		int[] data = new int[] { 42, 156, 255, 0 };
 		for (int x : data) {
-			s.writeByte((byte) x);
+			m.writeByte((byte) x);
 		}
 		b.reset();
 		Demodulator d = new Demodulator(b, new Filter(new double[] { 1 }));
@@ -39,10 +39,10 @@ public class DemodulatorTest {
 	@Test
 	public void testData() throws IOException {
 		BufferedStream b = new BufferedStream(1024 * 16);
-		Sender s = new Sender(b);
+		Modulator m = new Modulator(b);
 		byte[] data = new byte[] { 42, -100, -1, 0 };
-		s.writeData(data, data.length);
-		s.writeEOF();
+		m.writeData(data, data.length);
+		m.writeEOF();
 
 		b.reset();
 

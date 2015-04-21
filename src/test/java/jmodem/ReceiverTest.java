@@ -13,12 +13,12 @@ public class ReceiverTest {
 		byte[] bytes = "foo bar\nxxyyzz\n".getBytes();
 
 		BufferedStream b = new BufferedStream(48 * 1000);
-		Sender s = new Sender(b);
-		s.writeSilence(100);
-		s.writePrefix();
-		s.writeTraining();
-		s.writeData(bytes, bytes.length);
-		s.writeEOF();
+		Modulator m = new Modulator(b);
+		m.writeSilence(100);
+		m.writePrefix();
+		m.writeTraining();
+		m.writeData(bytes, bytes.length);
+		m.writeEOF();
 
 		b.reset();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();

@@ -2,6 +2,8 @@ package jmodem;
 
 import java.io.IOException;
 
+import jmodem.Sender.OutputStreamWrapper;
+
 public class Utils {
 
 	public static double[] cos(int n) {
@@ -39,6 +41,12 @@ public class Utils {
 	}
 	public static void log(String s) {
 		System.err.println(s);
+	}
+	public static void writeSilence(OutputStreamWrapper dst, double seconds) throws IOException {
+		final double dt = 1.0 / Config.sampleRate;
+		for (double t = 0; t < seconds; t += dt) {
+			dst.write(0.0);
+		}	
 	}
 
 }
