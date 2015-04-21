@@ -10,6 +10,7 @@ public class DetectorTest {
 	public void test() throws Exception {
 		BufferedStream b = new BufferedStream(1024 * 48);
 		Sender s = new Sender(b);
+		s.writeSilence(100);
 		s.writePrefix();
 		int offset = b.offset;
 		s.writeTraining();

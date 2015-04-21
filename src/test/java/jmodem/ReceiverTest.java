@@ -14,6 +14,7 @@ public class ReceiverTest {
 
 		BufferedStream b = new BufferedStream(48 * 1000);
 		Sender s = new Sender(b);
+		s.writeSilence(100);
 		s.writePrefix();
 		s.writeTraining();
 		s.writeData(bytes, bytes.length);
