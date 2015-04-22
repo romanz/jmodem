@@ -2,7 +2,7 @@ package jmodem;
 
 import java.io.IOException;
 
-public class Sampler implements InputSampleStream {
+class Sampler implements InputSampleStream {
 
 	public final int width = 128;
 	public final int resolution = 1024;

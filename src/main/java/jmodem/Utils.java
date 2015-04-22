@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import jmodem.Sender.OutputStreamWrapper;
 
-public class Utils {
+class Utils {
 
 	public static double[] cos(int n) {
 		double[] res = zeros(n);

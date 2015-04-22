@@ -3,7 +3,7 @@ package jmodem;
 import java.io.EOFException;
 import java.io.IOException;
 
-public class BufferedStream implements InputSampleStream, OutputSampleStream {
+class BufferedStream implements InputSampleStream, OutputSampleStream {
 
 	double[] buffer;
 	int offset;

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.zip.CRC32;
 
-public class Modulator {
+class Modulator {
 	final private static double[] cos = Utils.cos(Config.symbolLength);
 	final private static double[] sin = Utils.sin(Config.symbolLength);
 

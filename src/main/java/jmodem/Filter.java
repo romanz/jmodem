@@ -1,6 +1,6 @@
 package jmodem;
 
-public class Filter {
+class Filter {
 
 	final double[] coeffs;
 	final int length;

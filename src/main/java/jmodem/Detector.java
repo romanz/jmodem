@@ -3,7 +3,7 @@ package jmodem;
 import java.io.IOException;
 import java.util.ArrayDeque;
 
-public class Detector {
+class Detector {
 
 	private final InputSampleStream src;
 	private final ArrayDeque<double[]> frames;

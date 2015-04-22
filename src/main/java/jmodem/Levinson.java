@@ -1,6 +1,6 @@
 package jmodem;
 
-public class Levinson {
+class Levinson {
 
 	public static double[] solver(double[] t, double[] y) {
 		final int N = t.length;

@@ -1,6 +1,6 @@
 package jmodem;
 
-public class Vector {
+class Vector {
 
 	private final double[] data;
 	private final int offset;

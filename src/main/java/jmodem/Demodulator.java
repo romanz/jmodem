@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.zip.CRC32;
 
-public class Demodulator {
+class Demodulator {
 
 	private final InputSampleStream sig;
 	private final Filter filt;

@@ -2,7 +2,7 @@ package jmodem;
 
 import java.io.IOException;
 
-public class Equalizer {
+class Equalizer {
 
 	private final int order;
 	private final int lookahead;
