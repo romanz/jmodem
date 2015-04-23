@@ -52,5 +52,7 @@ public class Sender {
 		OutputStreamWrapper dst = new OutputStreamWrapper(System.out);
 		Utils.writeSilence(dst, 1.0);
 		run(System.in, dst);
+		Utils.writeSilence(dst, 1.0);
+		
 	}
 }

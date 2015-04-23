@@ -34,22 +34,22 @@ class Modulator {
 	}
 
 	public void writePrefix() throws IOException {
-		writeSilence(50);
-		writeSymbols(0f, -1f, 400);
-		writeSilence(50);
+		writeSilence(Config.prefixSilence);
+		writeSymbols(0f, -1f, Config.prefixSymbols);
+		writeSilence(Config.prefixSilence);
 	}
 
 	public void writeTraining() throws IOException {
-		writeSilence(100);
-		for (int register = 0x0001, i = 0; i < 500; i++) {
-			int k = (i < 16) ? 0 : (register & 3);
+		writeSilence(Config.trainingSilence);
+		for (int register = 0x0001, i = 0; i < Config.trainingSymbols; i++) {
+			int k = (i < Config.trainingConstant) ? 0 : (register & 3);
 			writeSymbols(cos[k], -sin[k], 1);
 			register = register << 1;
 			if (register >> 16 != 0) {
 				register = register ^ 0x1100b;
 			}
 		}
-		writeSilence(100);
+		writeSilence(Config.trainingSilence);
 	}
 
 	public void writeData(byte[] data, int length) throws IOException {
@@ -81,7 +81,7 @@ class Modulator {
 
 	public void writeEOF() throws IOException {
 		writeChecksum(null, 0, 0);
-		writeSilence(100);
+		writeSilence(Config.postfixSilence);
 	}
 
 }

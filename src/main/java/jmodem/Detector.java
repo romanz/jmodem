@@ -45,11 +45,11 @@ class Detector {
 	}
 
 	double[] detect() throws IOException {
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < Config.prefixSilence; i++) {
 			process(1); // prefix frames
 		}
 		int count = 0;
-		while (count < 360) {
+		while (count < Config.prefixSymbols) {
 			boolean good = process(0.9);
 			if (good) {
 				count++;

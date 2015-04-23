@@ -1,7 +1,7 @@
 #!/bin/bash
 mvn clean package
 
-set -x
+set -x -e
 
 check() {
     sha256sum data.tx | sed s/tx/rx/ | sha256sum -c
