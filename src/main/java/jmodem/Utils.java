@@ -32,6 +32,13 @@ class Utils {
 		}
 		return res;
 	}
+	public static double mean(double[] x) {
+		double sum = 0;
+		for (int i = 0; i < x.length; i++) {
+			sum += x[i];
+		}
+		return sum / x.length;
+	}
 	public static double[] take(InputSampleStream s, int n) throws IOException {
 		double[] signal = zeros(n);
 		for (int i = 0; i < n; i++) {

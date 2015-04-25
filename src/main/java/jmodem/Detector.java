@@ -2,6 +2,7 @@ package jmodem;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 
 class Detector {
 
@@ -115,21 +116,35 @@ class Detector {
 		Complex[] symbols = d.getSymbols(Config.prefixSymbols);
 
 		final int skip = 5;
-		double sum = 0.0;
-		int count = 0;
-		for (int i = skip + 1; i < symbols.length - skip; i++) {
-			Complex z1 = symbols[i - 1];
-			Complex z2 = symbols[i];
-			// Compute "delta" phase of (z2' * z1)
-			double real = z1.real * z2.real + z1.imag * z2.imag;
-			double imag = z1.imag * z2.real - z1.real * z2.imag;
-			sum += Math.atan2(imag, real);
-			count++;
+		double[] phases = new double[symbols.length - 2 * skip];
+		for (int i = 0; i < phases.length; i++) {
+			Complex z = symbols[i + skip];
+			phases[i] = Math.atan2(z.imag, z.real) / (2 * Math.PI);
 		}
-		double avgDrift = sum / count;
-		return avgDrift * Config.baudRate / (2 * Math.PI * Config.carrierFreq);
+		unwrap(phases);
+		return slope(phases) * Config.baudRate / (double)Config.carrierFreq;
+	}
+	
+	void unwrap(double[] x) {
+		for (int i = 1; i < x.length; i++) {
+			double delta = x[i] - x[i-1];
+			x[i] -= Math.round(delta);
+		}
 	}
 
+	double slope(double[] x) {
+		double Cii = 0, Cxi = 0; 
+		final double mx = Utils.mean(x);
+		final double mi = x.length / 2.0;
+		for (int i = 0; i < x.length; i++) {
+			double x_ = x[i] - mx;
+			double i_ = i - mi;
+			Cii += (i_ * i_);
+			Cxi += (x_ * i_);
+		}
+		return Cxi / Cii;
+	}
+	
 	public double frequencyDrift() {
 		return drift;
 	}
