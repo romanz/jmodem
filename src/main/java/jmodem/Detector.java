@@ -2,7 +2,6 @@ package jmodem;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 
 class Detector {
 
