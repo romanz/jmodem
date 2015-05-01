@@ -3,6 +3,7 @@ package jmodem;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
 class Demodulator {
@@ -10,6 +11,8 @@ class Demodulator {
 	private final InputSampleStream sig;
 	private final Filter filt;
 	private final double scaling;
+	
+	private static final Logger log = Logger.getLogger("Demodulator");
 
 	public Demodulator(InputSampleStream signal, Filter filter) {
 		sig = signal;
@@ -42,12 +45,17 @@ class Demodulator {
 		}
 		return symbols;
 	}
+	
+	public int getIndex(Complex symbol) {
+		int index = symbol.nearest(Config.constellation);
+		return index;
+	}
 
 	public int getByte() throws IOException {
 		int result = 0;
 		int i = 0;
 		for (Complex symbol : getSymbols(8)) {
-			int bit = (symbol.imag > 0) ? 0 : 1;
+			int bit = getIndex(symbol);
 			result += (bit << i);
 			i++;
 		}
@@ -57,6 +65,7 @@ class Demodulator {
 	public void run(OutputStream dst) throws IOException {
 		while (true) {
 			int len = getByte();
+			log.info("new packet: " + len + " bytes");
 			byte[] buf = new byte[len];
 			for (int i = 0; i < len; i++) {
 				buf[i] = (byte) getByte();
@@ -66,7 +75,11 @@ class Demodulator {
 			crc.update(buf, Config.checksumSize, len);
 			int expected = (int) crc.getValue();
 			int got = ByteBuffer.wrap(buf, 0, Config.checksumSize).getInt();
-			if (expected != got) {
+			boolean error = expected != got;
+			
+			String status = error ? " (ERROR)" : " (OK)";
+			log.info("checksum: " + got + status);
+			if (error) {
 				throw new IOException("bad checksum");
 			}
 			if (len == 0) {

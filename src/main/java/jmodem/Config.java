@@ -24,5 +24,9 @@ public class Config {
 
 	final static int fileBufferSize = 4096;
 	final static int postfixSilence = 100;
+	public static Complex[] constellation = {
+		new Complex(0, +1), 
+		new Complex(0, -1)
+	};
 
 }

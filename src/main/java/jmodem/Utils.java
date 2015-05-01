@@ -32,6 +32,15 @@ class Utils {
 		}
 		return res;
 	}
+	public static int argmin(double[] xs) {
+		int res = 0;
+		for (int i = 1; i < xs.length; i++) {
+			if (xs[i] < xs[res]) {
+				res = i;
+			}
+		}
+		return res;
+	}
 	public static double mean(double[] x) {
 		double sum = 0;
 		for (int i = 0; i < x.length; i++) {
