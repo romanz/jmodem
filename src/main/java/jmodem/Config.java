@@ -1,9 +1,9 @@
 package jmodem;
 
-public class Config {
+class Config {
 
-	public final static double scalingFactor = 30e3;
-	public final static int sampleRate = 8000;
+	final static double scalingFactor = 30e3;
+	final static int sampleRate = 8000;
 
 	final static int symbolLength = 8;
 	final static int carrierFreq = 2000;

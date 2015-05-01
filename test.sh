@@ -8,12 +8,13 @@ check() {
 }
 
 dd if=/dev/urandom of=data.tx bs=10kB count=1
+JAR='target/jmodem-0.1.jar'
 
 amodem send -q -i data.tx -l- -o audio.tx
-java -cp target/jmodem-*.jar jmodem.Receiver <audio.tx >data.rx
+java -cp $JAR jmodem.Main recv <audio.tx >data.rx
 check
 
-java -cp target/jmodem-*.jar jmodem.Sender <data.tx >audio.tx
+java -cp $JAR jmodem.Main send <data.tx >audio.tx
 amodem recv -q -i audio.tx -l- -o data.rx
 check
 

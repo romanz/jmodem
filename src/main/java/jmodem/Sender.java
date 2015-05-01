@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class Sender {
+class Sender {
 
 	public static void run(InputStream src, OutputSampleStream dst) throws IOException {
 		Modulator m = new Modulator(dst);
@@ -48,7 +48,7 @@ public class Sender {
 			buf.rewind();
 		}
 	}
-	public static void main(String[] args) throws Exception {
+	static void main(String[] args) throws IOException {
 		OutputStreamWrapper dst = new OutputStreamWrapper(System.out);
 		Utils.writeSilence(dst, 1.0);
 		run(System.in, dst);

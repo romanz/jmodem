@@ -9,7 +9,7 @@ import java.nio.ByteOrder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Receiver {
+class Receiver {
 	
 	private static final Logger log = Logger.getLogger("Receiver");
 
@@ -52,7 +52,7 @@ public class Receiver {
 		}
 	}
 
-	public static void main(String[] args) throws Exception {
+	static void main(String[] args) throws IOException {
 		Logger root = Logger.getGlobal();
 		root.setLevel(Level.ALL);
 		
