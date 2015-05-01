@@ -45,7 +45,10 @@
           <configuration>
               <proguardVersion>4.10</proguardVersion>
               <options>
-                  <option>-keep public class jmodem.Main{public static void main(java.lang.String[]);}</option>
+                  <option>-keepattributes Exceptions</option>
+                  <option>-keep public class jmodem.OutputSampleStream {*;}</option>
+                  <option>-keep public class jmodem.InputSampleStream {*;}</option>
+                  <option>-keep public class jmodem.Main {*;}</option>
               </options>
               <libs>
                   <lib>${java.home}/lib/rt.jar</lib>
